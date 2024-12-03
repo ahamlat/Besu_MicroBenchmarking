@@ -56,7 +56,7 @@ public class KeccakBenchmark {
         byte[] srcAddress = new byte[ADDRESS_SIZE];
         r.nextBytes(srcAddress);
         address = Bytes.wrap(srcAddress);
-        trieKeyAdapter = new TrieKeyAdapter(StemHasherBuilder.builder().withStemCache(new InMemoryCacheStrategy<>(10)).withAddressCommitmentCache(new InMemoryCacheStrategy<>(100)).build());
+        trieKeyAdapter = new TrieKeyAdapter(StemHasherBuilder.builder().withAddressCommitmentCache(new InMemoryCacheStrategy<>(100)).build());
         trieKeyAdapter.storageKey(address, bytes);
     }
 
