@@ -5,7 +5,8 @@ import net.consensys.keccak.bouncycastle.Hash;
 import org.apache.tuweni.bytes.Bytes;
 import org.apache.tuweni.bytes.Bytes32;
 import org.hyperledger.besu.ethereum.trie.verkle.adapter.TrieKeyAdapter;
-import org.hyperledger.besu.ethereum.trie.verkle.hasher.PedersenHasher;
+import org.hyperledger.besu.ethereum.trie.verkle.hasher.builder.StemHasherBuilder;
+import org.hyperledger.besu.ethereum.trie.verkle.hasher.cache.InMemoryCacheStrategy;
 import org.hyperledger.besu.nativelib.ipamultipoint.LibIpaMultipoint;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
@@ -55,14 +56,16 @@ public class KeccakBenchmark {
         byte[] srcAddress = new byte[ADDRESS_SIZE];
         r.nextBytes(srcAddress);
         address = Bytes.wrap(srcAddress);
-        trieKeyAdapter = new TrieKeyAdapter(new PedersenHasher());
+        trieKeyAdapter = new TrieKeyAdapter(StemHasherBuilder.builder().withStemCache(new InMemoryCacheStrategy<>(10)).withAddressCommitmentCache(new InMemoryCacheStrategy<>(100)).build());
         trieKeyAdapter.storageKey(address, bytes);
     }
 
     @Benchmark
     public void keccakBCVersionjdk15on (final Blackhole blackhole) {
         Bytes32 hash = Hash.keccak256(bytes);
+        Bytes32 has2h = Hash.keccak256(address);
         blackhole.consume(hash);
+        blackhole.consume(has2h);
     }
 
     @Benchmark
@@ -80,7 +83,7 @@ public class KeccakBenchmark {
     public static void main(String[] args) throws RunnerException, IOException {
         Options opt = new OptionsBuilder()
                 .include(KeccakBenchmark.class.getSimpleName())
-                .addProfiler(AsyncProfiler.class)
+                //.addProfiler(AsyncProfiler.class)
                 .build();
 
         new Runner(opt).run();

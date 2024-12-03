@@ -58,9 +58,25 @@
             <version>0.8.5</version>
         </dependency>
         <dependency>
+            <groupId>org.hyperledger.besu.internal</groupId>
+            <artifactId>algorithms</artifactId>
+            <version>24.9.1</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hyperledger.besu</groupId>
+            <artifactId>constantine</artifactId>
+            <version>0.9.6-SNAPSHOT-TEST</version>
+        </dependency>
+        <dependency>
+            <groupId>org.hyperledger.besu</groupId>
+            <artifactId>gnark</artifactId>
+            <version>0.9.6-SNAPSHOT</version>
+        </dependency>
+        <dependency>
             <groupId>org.hyperledger.besu</groupId>
             <artifactId>besu-verkle-trie</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>0.0.3-SNAPSHOT-OP1</version>
         </dependency>
 
         <dependency>
