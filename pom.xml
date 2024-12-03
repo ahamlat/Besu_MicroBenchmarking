@@ -9,6 +9,16 @@
     <version>1.0-SNAPSHOT</version>
     <repositories>
         <repository>
+            <id>local-repository</id>
+            <url>file://${user.home}/.m2/repository</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+        <repository>
             <id>hyperledger-besu-maven</id>
             <url>https://hyperledger.jfrog.io/hyperledger/besu-maven</url>
             <releases>
