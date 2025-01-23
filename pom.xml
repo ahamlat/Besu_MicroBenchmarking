@@ -97,7 +97,7 @@
         <dependency>
             <groupId>org.hyperledger.besu.internal</groupId>
             <artifactId>core</artifactId>
-            <version>24.12-develop-f164dc9</version>
+            <version>24.10.0</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.hyperledger.besu.internal/kvstore -->
