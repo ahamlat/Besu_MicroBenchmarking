@@ -2,6 +2,7 @@ package net.consensys.keccak;
 
 import net.consensys.keccak.cryptohash.Keccak256;
 import net.consensys.keccak.bouncycastle.Hash;
+import net.consensys.keccak.vectorapi.KeccakDigest;
 import org.apache.tuweni.bytes.Bytes;
 import org.apache.tuweni.bytes.Bytes32;
 import org.hyperledger.besu.ethereum.trie.verkle.adapter.TrieKeyAdapter;
@@ -25,12 +26,16 @@ import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
-@Warmup(iterations = 50, time = 1)
-@Measurement(iterations = 50, time = 1)
-@Fork(1)
+@Warmup(iterations = 1000, time = 100, timeUnit = TimeUnit.MILLISECONDS)
+@Measurement(iterations = 1000, time = 100, timeUnit = TimeUnit.MILLISECONDS)
+@Fork(jvmArgs = {
+        "--enable-preview",
+        "--add-modules=jdk.incubator.vector"
+})
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
 @State(Scope.Benchmark)
@@ -39,36 +44,59 @@ public class KeccakBenchmark {
     @Param({"32"}) int SIZE;
     Bytes32 bytes;
 
+    byte[] src;
 
+/*
     @Param({"20"}) int ADDRESS_SIZE;
-    Bytes address;
+    Bytes address;*/
 
-    TrieKeyAdapter trieKeyAdapter;
+    //TrieKeyAdapter trieKeyAdapter;
 
     @Setup
-
     public void setup() {
-        byte[] src = new byte[SIZE];
+        src = new byte[SIZE];
         final Random r = new Random(7L);
         r.nextBytes(src);
         bytes = Bytes32.wrap(src);
-        byte[] srcAddress = new byte[ADDRESS_SIZE];
+       /* byte[] srcAddress = new byte[ADDRESS_SIZE];
         r.nextBytes(srcAddress);
         address = Bytes.wrap(srcAddress);
         trieKeyAdapter = new TrieKeyAdapter(new PedersenHasher());
-        trieKeyAdapter.storageKey(address, bytes);
+        trieKeyAdapter.storageKey(address, bytes);*/
     }
 
     @Benchmark
     public void keccakBCVersionjdk15on (final Blackhole blackhole) {
+     //  System.out.println(bytes.toHexString());
         Bytes32 hash = Hash.keccak256(bytes);
+     //   System.out.println(hash.toHexString());
         blackhole.consume(hash);
     }
 
+    /*
     @Benchmark
     public void stemCryptoHash(final Blackhole blackhole) {
         Bytes storageStem = trieKeyAdapter.storageKey(address, bytes);
         blackhole.consume(storageStem);
+    }*/
+/*
+    @Benchmark
+    public void keccakWithVecorAPI(final Blackhole blackhole) {
+    //    System.out.println(bytes.toHexString());
+        KeccakDigest keccak = new KeccakDigest(256); // Instantiate with a fixed output length (e.g., 256 bits)
+        keccak.update(src, 0, src.length);
+        byte[] hash = new byte[keccak.getDigestSize()];
+        keccak.doFinal(hash, 0);
+      //  System.out.println(Bytes.wrap(hash).toHexString());
+        blackhole.consume(hash);
+    }*/
+
+    @Benchmark
+    public void keccakCryptoHash(final Blackhole blackhole) {
+   //     System.out.println(Bytes.wrap(src).toHexString());
+        Bytes32 hash =  Bytes32.wrap(sha3(src));
+   //      System.out.println(hash.toHexString());
+        blackhole.consume(hash);
     }
 
     public static byte[] sha3(byte[] input) {
