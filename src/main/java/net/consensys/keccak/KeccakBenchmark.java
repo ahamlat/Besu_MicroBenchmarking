@@ -2,7 +2,6 @@ package net.consensys.keccak;
 
 import net.consensys.keccak.cryptohash.Keccak256;
 import net.consensys.keccak.bouncycastle.Hash;
-import net.consensys.keccak.vectorapi.KeccakDigest;
 import org.apache.tuweni.bytes.Bytes;
 import org.apache.tuweni.bytes.Bytes32;
 import org.hyperledger.besu.ethereum.trie.verkle.adapter.TrieKeyAdapter;
