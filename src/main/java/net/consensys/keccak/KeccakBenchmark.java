@@ -29,8 +29,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
-@Warmup(iterations = 1000, time = 100, timeUnit = TimeUnit.MILLISECONDS)
-@Measurement(iterations = 1000, time = 100, timeUnit = TimeUnit.MILLISECONDS)
+@Warmup(iterations = 100, time = 100, timeUnit = TimeUnit.MILLISECONDS)
+@Measurement(iterations = 100, time = 100, timeUnit = TimeUnit.MILLISECONDS)
 @Fork(jvmArgs = {
         "--enable-preview",
         "--add-modules=jdk.incubator.vector"
