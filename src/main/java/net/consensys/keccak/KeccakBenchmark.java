@@ -107,7 +107,7 @@ public class KeccakBenchmark {
     public static void main(String[] args) throws RunnerException, IOException {
         Options opt = new OptionsBuilder()
                 .include(KeccakBenchmark.class.getSimpleName())
-                .addProfiler(AsyncProfiler.class)
+             //   .addProfiler(AsyncProfiler.class)
                 .build();
 
         new Runner(opt).run();
