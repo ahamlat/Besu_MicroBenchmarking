@@ -6,7 +6,9 @@
 package org.bouncycastle.crypto.digests;
 
 import jdk.incubator.vector.LongVector;
+import jdk.incubator.vector.VectorMask;
 import jdk.incubator.vector.VectorOperators;
+import jdk.incubator.vector.VectorShuffle;
 import jdk.incubator.vector.VectorSpecies;
 import org.bouncycastle.crypto.CryptoServiceProperties;
 import org.bouncycastle.crypto.CryptoServicePurpose;
@@ -270,17 +272,14 @@ public class KeccakDigest implements ExtendedDigest {
     private void KeccakPermutation()
     {
         long[] A = state;
+        VectorMask<Long> mask = VectorMask.fromLong(SPECIES, 0b11111);
+        LongVector a0to4Vector ;
+        LongVector a5to9Vector ;
+        LongVector a10t014Vector ;
+        LongVector a15to19Vector ;
+        LongVector a20to24Vector ;
 
-        LongVector aline0001 ;
-        LongVector aline0203 ;
-        LongVector aline0506 ;
-        LongVector aline0708 ;
-        LongVector aline1011 ;
-        LongVector aline1213 ;
-        LongVector aline1516 ;
-        LongVector aline1718 ;
-        LongVector aline2021 ;
-        LongVector aline2223 ;
+
 
         LongVector cline12 ;
         LongVector cline40 ;
@@ -294,68 +293,45 @@ public class KeccakDigest implements ExtendedDigest {
             //  long c2 = a02 ^ a07 ^ a12 ^ a17 ^ a22;
             //  long c3 = a03 ^ a08 ^ a13 ^ a18 ^ a23;
             //  long c4 = a04 ^ a09 ^ a14 ^ a19 ^ a24;
-            aline0001 = LongVector.fromArray(SPECIES,A, 0);
-            aline0203 = LongVector.fromArray(SPECIES,A, 2);
-            aline0506 = LongVector.fromArray(SPECIES,A, 5);
-            aline0708 = LongVector.fromArray(SPECIES,A, 7);
-            aline1011 = LongVector.fromArray(SPECIES,A, 10);
-            aline1213 = LongVector.fromArray(SPECIES,A, 12);
-            aline1516 = LongVector.fromArray(SPECIES,A, 15);
-            aline1718 = LongVector.fromArray(SPECIES,A, 17);
-            aline2021 = LongVector.fromArray(SPECIES,A, 20);
-            aline2223 = LongVector.fromArray(SPECIES,A, 22);
+            a0to4Vector = LongVector.fromArray(SPECIES,A, 0, mask);
+            a5to9Vector = LongVector.fromArray(SPECIES,A, 5, mask);
+            a10t014Vector = LongVector.fromArray(SPECIES,A, 10, mask);
+            a15to19Vector = LongVector.fromArray(SPECIES,A, 15, mask);
+            a20to24Vector = LongVector.fromArray(SPECIES,A, 20, mask);
 
-            var c0to1 = aline0001.lanewise(VectorOperators.XOR, aline0506).lanewise(VectorOperators.XOR, aline1011).lanewise(VectorOperators.XOR, aline1516).lanewise(VectorOperators.XOR, aline2021);
-            var c2to3 = aline0203.lanewise(VectorOperators.XOR, aline0708).lanewise(VectorOperators.XOR, aline1213).lanewise(VectorOperators.XOR, aline1718).lanewise(VectorOperators.XOR, aline2223);
-
-            long[] cArray = c0to1.toArray();
-            long c0 = cArray[0];
-            long c1 = cArray[1];
-            long[] cArray2 = c2to3.toArray();
-            long c2 = cArray2[0];
-            long c3 = cArray2[1];
-            long c4 = A[4] ^ A[9] ^  A[14] ^ A[19] ^ A[24];
-
-            cline12 = LongVector.fromArray(SPECIES,new long[]{c1, c2}, 0);
-            cline40 = LongVector.fromArray(SPECIES,new long[]{c4, c0}, 0);
-            cline34 = LongVector.fromArray(SPECIES,new long[]{c3, c4}, 0);
-
-            var d12 = cline12.lanewise(VectorOperators.LSHL, 1).lanewise(VectorOperators.OR, cline12.lanewise(VectorOperators.LSHR, -1)).lanewise(VectorOperators.XOR, cline40);
-            var d34 = cline34.lanewise(VectorOperators.LSHL, 1).lanewise(VectorOperators.OR, cline34.lanewise(VectorOperators.LSHR, -1)).lanewise(VectorOperators.XOR, cline12);
-
+            var c0to4Vector = a0to4Vector.lanewise(VectorOperators.XOR, a5to9Vector).lanewise(VectorOperators.XOR, a10t014Vector).lanewise(VectorOperators.XOR, a15to19Vector).lanewise(VectorOperators.XOR, a20to24Vector);
+            var shuffle = VectorShuffle.fromValues(SPECIES, 3, 4, 0, 1, 2, 5, 6, 7); // Rearrange the elements according to the shuffle
+            var c0to4VectorShuffled = c0to4Vector.rearrange(shuffle);
+            var d0to4Vector = c0to4Vector.lanewise(VectorOperators.LSHL, 1).lanewise(VectorOperators.OR, c0to4Vector.lanewise(VectorOperators.LSHR, -1)).lanewise(VectorOperators.XOR, c0to4VectorShuffled);
+            // long d0 = (c0 << 1 | c0 >>> -1) ^ c3;
             //long d1 = (c1 << 1 | c1 >>> -1) ^ c4;
             //long d2 = (c2 << 1 | c2 >>> -1) ^ c0;
             //long d3 = (c3 << 1 | c3 >>> -1) ^ c1;
             //long d4 = (c4 << 1 | c4 >>> -1) ^ c2;
 
-            long d0 = (c0 << 1 | c0 >>> -1) ^ c3;
+            var dshuffle = VectorShuffle.fromValues(SPECIES, 1, 2, 3, 4, 0, 5, 6, 7); // Rearrange the elements according to the shuffle
+            var d0to4VectorSuffled = c0to4Vector.rearrange(dshuffle);
+            a0to4Vector = a0to4Vector.lanewise(VectorOperators.XOR, d0to4VectorSuffled);
+            a5to9Vector = a5to9Vector.lanewise(VectorOperators.XOR, d0to4VectorSuffled);
+            a10t014Vector = a10t014Vector.lanewise(VectorOperators.XOR, d0to4VectorSuffled);
+            a15to19Vector = a15to19Vector.lanewise(VectorOperators.XOR, d0to4VectorSuffled);
+            a20to24Vector = a20to24Vector.lanewise(VectorOperators.XOR, d0to4VectorSuffled);
+
             //  a00 ^= d1; a05 ^= d1; a10 ^= d1; a15 ^= d1; a20 ^= d1;
             //  a01 ^= d2; a06 ^= d2; a11 ^= d2; a16 ^= d2; a21 ^= d2;
-            aline0001 = aline0001.lanewise(VectorOperators.XOR, d12);
-            aline0506 = aline0506.lanewise(VectorOperators.XOR, d12);
-            aline1011 = aline1011.lanewise(VectorOperators.XOR, d12);
-            aline1516 = aline1516.lanewise(VectorOperators.XOR, d12);
-            aline2021 = aline2021.lanewise(VectorOperators.XOR, d12);
             //   a02 ^= d3; a07 ^= d3; a12 ^= d3; a17 ^= d3; a22 ^= d3;
             //   a03 ^= d4; a08 ^= d4; a13 ^= d4; a18 ^= d4; a23 ^= d4;
-            aline0203 = aline0203.lanewise(VectorOperators.XOR, d34);
-            aline0708 = aline0708.lanewise(VectorOperators.XOR, d34);
-            aline1213 = aline1213.lanewise(VectorOperators.XOR, d34);
-            aline1718 = aline1718.lanewise(VectorOperators.XOR, d34);
-            aline2223 = aline2223.lanewise(VectorOperators.XOR, d34);
+            // A[4] ^= d0; A[9] ^= d0; A[14] ^= d0; A[19] ^= d0; A[24] ^= d0;
 
-            aline0001.intoArray(A, 0);
-            aline0203.intoArray(A, 2);
-            aline0506.intoArray(A, 5);
-            aline0708.intoArray(A, 7);
-            aline1011.intoArray(A, 10);
-            aline1213.intoArray(A, 12);
-            aline1516.intoArray(A, 15);
-            aline1718.intoArray(A, 17);
-            aline2021.intoArray(A, 20);
-            aline2223.intoArray(A, 22);
+            a0to4Vector.intoArray(A, 0, mask);
+            a5to9Vector.intoArray(A, 5, mask);
+            a10t014Vector.intoArray(A, 10, mask);
+            a15to19Vector.intoArray(A, 15, mask);
+            a20to24Vector.intoArray(A, 20, mask);
 
-            A[4] ^= d0; A[9] ^= d0; A[14] ^= d0; A[19] ^= d0; A[24] ^= d0;
+            var c0to4 = c0to4Vector.toArray();
+            long c0 = c0to4[0];
+            long c1 = c0to4[1];
 
             // rho/pi
             c1  = A[1] <<  1 | A[1] >>> 63;
