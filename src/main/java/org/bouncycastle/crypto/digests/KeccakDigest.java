@@ -19,7 +19,7 @@ import org.bouncycastle.util.Pack;
 
 public class KeccakDigest implements ExtendedDigest {
     private static long[] KeccakRoundConstants = new long[]{1L, 32898L, -9223372036854742902L, -9223372034707259392L, 32907L, 2147483649L, -9223372034707259263L, -9223372036854743031L, 138L, 136L, 2147516425L, 2147483658L, 2147516555L, -9223372036854775669L, -9223372036854742903L, -9223372036854743037L, -9223372036854743038L, -9223372036854775680L, 32778L, -9223372034707292150L, -9223372034707259263L, -9223372036854742912L, 2147483649L, -9223372034707259384L};
-    private VectorSpecies<Long> SPECIES = LongVector.SPECIES_512;
+    private VectorSpecies<Long> SPECIES = LongVector.SPECIES_256;
 
     protected final CryptoServicePurpose purpose;
     protected long[] state;
@@ -279,11 +279,8 @@ public class KeccakDigest implements ExtendedDigest {
         LongVector a15to19Vector ;
         LongVector a20to24Vector ;
 
-
-
-        LongVector cline12 ;
-        LongVector cline40 ;
-        LongVector cline34;
+        long c0;
+        long c1;
 
         for (int i = 0; i < 24; i++)
         {
@@ -330,8 +327,6 @@ public class KeccakDigest implements ExtendedDigest {
             a20to24Vector.intoArray(A, 20, mask);
 
             var c0to4 = c0to4Vector.toArray();
-            long c0 = c0to4[0];
-            long c1 = c0to4[1];
 
             // rho/pi
             c1  = A[1] <<  1 | A[1] >>> 63;
