@@ -278,6 +278,17 @@ public class KeccakDigest implements ExtendedDigest {
         LongVector a10t014Vector ;
         LongVector a15to19Vector ;
         LongVector a20to24Vector ;
+        int index = 0;
+        var rhoA0to4Left = LongVector.fromArray(SPECIES, new long[]{0L, 1L, 62L, 28L, 27L}, index, mask);
+        var rhoA0to4Right = LongVector.fromArray(SPECIES, new long[]{0L, 63L, 2L, 36L, 37L}, index, mask);
+        var rhoA5to9Left = LongVector.fromArray(SPECIES, new long[]{36L, 44L, 6L, 55L, 20L}, index, mask);
+        var rhoA5to9Right = LongVector.fromArray(SPECIES, new long[]{28L, 20L, 58L, 9L, 44L}, index, mask);
+        var rhoA10to14Left = LongVector.fromArray(SPECIES, new long[]{3L, 10L, 43L, 25L, 39L}, index, mask);
+        var rhoA10to14Right = LongVector.fromArray(SPECIES, new long[]{61L, 54L, 21L, 39L, 25L}, index, mask);
+        var rhoA15to19Left = LongVector.fromArray(SPECIES, new long[]{41L, 45L, 15L, 21L, 8L}, index, mask);
+        var rhoA15to19Right = LongVector.fromArray(SPECIES, new long[]{23L, 19L, 49L, 43L, 56L}, index, mask);
+        var rhoA20to24Left = LongVector.fromArray(SPECIES, new long[]{18L, 2L, 61L, 56L, 14L}, index, mask);
+        var rhoA20to24Right = LongVector.fromArray(SPECIES, new long[]{46L, 62L, 3L, 8L, 50L}, index, mask);
 
         long c0;
         long c1;
@@ -320,6 +331,14 @@ public class KeccakDigest implements ExtendedDigest {
             //   a03 ^= d4; a08 ^= d4; a13 ^= d4; a18 ^= d4; a23 ^= d4;
             // A[4] ^= d0; A[9] ^= d0; A[14] ^= d0; A[19] ^= d0; A[24] ^= d0;
 
+
+            // rho
+            a0to4Vector = a0to4Vector.lanewise(VectorOperators.LSHL, rhoA0to4Left).lanewise(VectorOperators.OR, c0to4Vector.lanewise(VectorOperators.LSHR, rhoA0to4Right));
+            a5to9Vector = a5to9Vector.lanewise(VectorOperators.LSHL, rhoA5to9Left).lanewise(VectorOperators.OR, c0to4Vector.lanewise(VectorOperators.LSHR, rhoA5to9Right));
+            a10t014Vector = a10t014Vector.lanewise(VectorOperators.LSHL, rhoA10to14Left).lanewise(VectorOperators.OR, c0to4Vector.lanewise(VectorOperators.LSHR, rhoA10to14Right));
+            a15to19Vector = a15to19Vector.lanewise(VectorOperators.LSHL, rhoA15to19Left).lanewise(VectorOperators.OR, c0to4Vector.lanewise(VectorOperators.LSHR, rhoA15to19Right));
+            a20to24Vector = a20to24Vector.lanewise(VectorOperators.LSHL, rhoA20to24Left).lanewise(VectorOperators.OR, c0to4Vector.lanewise(VectorOperators.LSHR, rhoA20to24Right));
+
             a0to4Vector.intoArray(A, 0, mask);
             a5to9Vector.intoArray(A, 5, mask);
             a10t014Vector.intoArray(A, 10, mask);
@@ -327,7 +346,7 @@ public class KeccakDigest implements ExtendedDigest {
             a20to24Vector.intoArray(A, 20, mask);
 
             // rho/pi
-            c1  = A[1] <<  1 | A[1] >>> 63;
+            /*c1  = A[1] <<  1 | A[1] >>> 63;
             A[1] = A[6] << 44 | A[6] >>> 20;
             A[6] = A[9] << 20 | A[9] >>> 44;
             A[9] = A[22] << 61 | A[22] >>>  3;
@@ -351,7 +370,34 @@ public class KeccakDigest implements ExtendedDigest {
             A[17] = A[11] << 10 | A[11] >>> 54;
             A[11] = A[7] <<  6 | A[7] >>> 58;
             A[7] = A[10] <<  3 | A[10] >>> 61;
-            A[10] = c1;
+            A[10] = c1;*/
+
+            // Pi
+            A[16] = A[5];
+            A[7] = A[10];
+            A[23] = A[15];
+            A[14] = A[20];
+            A[10] = A[1];
+            A[1] = A[6];
+            A[17] = A[11];
+            A[8] = A[16];
+            A[24] = A[21];
+            A[20] = A[2];
+            A[11] = A[7];
+            A[2] = A[12];
+            A[18] = A[17];
+            A[9] = A[22];
+            A[5] = A[3];
+            A[21] = A[8];
+            A[12] = A[13];
+            A[3] = A[18];
+            A[19] = A[23];
+            A[15] = A[4];
+            A[6] = A[9];
+            A[22] = A[14];
+            A[13] = A[19];
+            A[4] = A[24];
+
 
             // chi
             c0 = A[0] ^ (~A[1] & A[2]);
