@@ -336,18 +336,12 @@ public class KeccakDigest implements ExtendedDigest {
 
 
             // rho
-            /*
+
             a0to4Vector = a0to4Vector.lanewise(VectorOperators.LSHL, rhoA0to4Left).lanewise(VectorOperators.OR, a0to4Vector.lanewise(VectorOperators.LSHR, rhoA0to4Right));
             a5to9Vector = a5to9Vector.lanewise(VectorOperators.LSHL, rhoA5to9Left).lanewise(VectorOperators.OR, a5to9Vector.lanewise(VectorOperators.LSHR, rhoA5to9Right));
             a10t014Vector = a10t014Vector.lanewise(VectorOperators.LSHL, rhoA10to14Left).lanewise(VectorOperators.OR, a10t014Vector.lanewise(VectorOperators.LSHR, rhoA10to14Right));
             a15to19Vector = a15to19Vector.lanewise(VectorOperators.LSHL, rhoA15to19Left).lanewise(VectorOperators.OR, a15to19Vector.lanewise(VectorOperators.LSHR, rhoA15to19Right));
             a20to24Vector = a20to24Vector.lanewise(VectorOperators.LSHL, rhoA20to24Left).lanewise(VectorOperators.OR, a20to24Vector.lanewise(VectorOperators.LSHR, rhoA20to24Right));
-*/
-            a0to4Vector = a0to4Vector.lanewise(VectorOperators.LSHL, rhoA0to4Left);
-            a5to9Vector = a5to9Vector.lanewise(VectorOperators.LSHL, rhoA5to9Left);
-            a10t014Vector = a10t014Vector.lanewise(VectorOperators.LSHL, rhoA10to14Left);
-            a15to19Vector = a15to19Vector.lanewise(VectorOperators.LSHL, rhoA15to19Left);
-            a20to24Vector = a20to24Vector.lanewise(VectorOperators.LSHL, rhoA20to24Left);
 
             a0to4Vector.intoArray(A, 0, mask);
             a5to9Vector.intoArray(A, 5, mask);
