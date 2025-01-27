@@ -307,7 +307,7 @@ public class KeccakDigest implements ExtendedDigest {
             //long d4 = (c4 << 1 | c4 >>> -1) ^ c2;
 
             var dshuffle = VectorShuffle.fromValues(SPECIES, 1, 2, 3, 4, 0, 5, 6, 7); // Rearrange the elements according to the shuffle
-            var d0to4VectorSuffled = c0to4Vector.rearrange(dshuffle);
+            var d0to4VectorSuffled = d0to4Vector.rearrange(dshuffle);
             a0to4Vector = a0to4Vector.lanewise(VectorOperators.XOR, d0to4VectorSuffled);
             a5to9Vector = a5to9Vector.lanewise(VectorOperators.XOR, d0to4VectorSuffled);
             a10t014Vector = a10t014Vector.lanewise(VectorOperators.XOR, d0to4VectorSuffled);
@@ -325,8 +325,6 @@ public class KeccakDigest implements ExtendedDigest {
             a10t014Vector.intoArray(A, 10, mask);
             a15to19Vector.intoArray(A, 15, mask);
             a20to24Vector.intoArray(A, 20, mask);
-
-            var c0to4 = c0to4Vector.toArray();
 
             // rho/pi
             c1  = A[1] <<  1 | A[1] >>> 63;
