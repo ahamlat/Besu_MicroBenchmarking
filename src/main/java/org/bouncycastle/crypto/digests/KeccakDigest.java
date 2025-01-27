@@ -323,10 +323,27 @@ public class KeccakDigest implements ExtendedDigest {
             var dshuffle = VectorShuffle.fromValues(SPECIES, 1, 2, 3, 4, 0, 5, 6, 7); // Rearrange the elements according to the shuffle
             var d0to4VectorSuffled = d0to4Vector.rearrange(dshuffle);
             a0to4Vector = a0to4Vector.lanewise(VectorOperators.XOR, d0to4VectorSuffled);
+            a0to4Vector = a0to4Vector.lanewise(VectorOperators.LSHL, rhoA0to4Left).lanewise(VectorOperators.OR, a0to4Vector.lanewise(VectorOperators.LSHR, rhoA0to4Right));
+            a0to4Vector.intoArray(A, 0, mask);
+
             a5to9Vector = a5to9Vector.lanewise(VectorOperators.XOR, d0to4VectorSuffled);
+            a5to9Vector = a5to9Vector.lanewise(VectorOperators.LSHL, rhoA5to9Left).lanewise(VectorOperators.OR, a5to9Vector.lanewise(VectorOperators.LSHR, rhoA5to9Right));
+            a5to9Vector.intoArray(A, 5, mask);
+
+
             a10t014Vector = a10t014Vector.lanewise(VectorOperators.XOR, d0to4VectorSuffled);
+            a10t014Vector = a10t014Vector.lanewise(VectorOperators.LSHL, rhoA10to14Left).lanewise(VectorOperators.OR, a10t014Vector.lanewise(VectorOperators.LSHR, rhoA10to14Right));
+            a10t014Vector.intoArray(A, 10, mask);
+
+
             a15to19Vector = a15to19Vector.lanewise(VectorOperators.XOR, d0to4VectorSuffled);
+            a15to19Vector = a15to19Vector.lanewise(VectorOperators.LSHL, rhoA15to19Left).lanewise(VectorOperators.OR, a15to19Vector.lanewise(VectorOperators.LSHR, rhoA15to19Right));
+            a15to19Vector.intoArray(A, 15, mask);
+
             a20to24Vector = a20to24Vector.lanewise(VectorOperators.XOR, d0to4VectorSuffled);
+            a20to24Vector = a20to24Vector.lanewise(VectorOperators.LSHL, rhoA20to24Left).lanewise(VectorOperators.OR, a20to24Vector.lanewise(VectorOperators.LSHR, rhoA20to24Right));
+            a20to24Vector.intoArray(A, 20, mask);
+
 
             //  a00 ^= d1; a05 ^= d1; a10 ^= d1; a15 ^= d1; a20 ^= d1;
             //  a01 ^= d2; a06 ^= d2; a11 ^= d2; a16 ^= d2; a21 ^= d2;
@@ -337,17 +354,7 @@ public class KeccakDigest implements ExtendedDigest {
 
             // rho
 
-            a0to4Vector = a0to4Vector.lanewise(VectorOperators.LSHL, rhoA0to4Left).lanewise(VectorOperators.OR, a0to4Vector.lanewise(VectorOperators.LSHR, rhoA0to4Right));
-            a5to9Vector = a5to9Vector.lanewise(VectorOperators.LSHL, rhoA5to9Left).lanewise(VectorOperators.OR, a5to9Vector.lanewise(VectorOperators.LSHR, rhoA5to9Right));
-            a10t014Vector = a10t014Vector.lanewise(VectorOperators.LSHL, rhoA10to14Left).lanewise(VectorOperators.OR, a10t014Vector.lanewise(VectorOperators.LSHR, rhoA10to14Right));
-            a15to19Vector = a15to19Vector.lanewise(VectorOperators.LSHL, rhoA15to19Left).lanewise(VectorOperators.OR, a15to19Vector.lanewise(VectorOperators.LSHR, rhoA15to19Right));
-            a20to24Vector = a20to24Vector.lanewise(VectorOperators.LSHL, rhoA20to24Left).lanewise(VectorOperators.OR, a20to24Vector.lanewise(VectorOperators.LSHR, rhoA20to24Right));
 
-            a0to4Vector.intoArray(A, 0, mask);
-            a5to9Vector.intoArray(A, 5, mask);
-            a10t014Vector.intoArray(A, 10, mask);
-            a15to19Vector.intoArray(A, 15, mask);
-            a20to24Vector.intoArray(A, 20, mask);
 
             // rho/pi
             /*c1  = A[1] <<  1 | A[1] >>> 63;
