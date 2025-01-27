@@ -278,20 +278,20 @@ public class KeccakDigest implements ExtendedDigest {
         LongVector a10t014Vector ;
         LongVector a15to19Vector ;
         LongVector a20to24Vector ;
-        var rhoA0to4Left = LongVector.fromArray(SPECIES, new long[]{0L, 1L, 62L, 28L, 27L}, 0, mask);
-        var rhoA0to4Right = LongVector.fromArray(SPECIES, new long[]{0L, 63L, 2L, 36L, 37L}, 0, mask);
+        var rhoA0to4Left = LongVector.fromArray(SPECIES, new long[]{0L, 1L, 62L, 28L, 27L, 0L, 0L, 0L}, 0);
+        var rhoA0to4Right = LongVector.fromArray(SPECIES, new long[]{0L, 63L, 2L, 36L, 37L, 0L, 0L, 0L}, 0, mask);
 
-        var rhoA5to9Left = LongVector.fromArray(SPECIES, new long[]{36L, 44L, 6L, 55L, 20L}, 0, mask);
-        var rhoA5to9Right = LongVector.fromArray(SPECIES, new long[]{28L, 20L, 58L, 9L, 44L}, 0, mask);
+        var rhoA5to9Left = LongVector.fromArray(SPECIES, new long[]{36L, 44L, 6L, 55L, 20L, 0L, 0L, 0L}, 0, mask);
+        var rhoA5to9Right = LongVector.fromArray(SPECIES, new long[]{28L, 20L, 58L, 9L, 44L, 0L, 0L, 0L}, 0, mask);
 
-        var rhoA10to14Left = LongVector.fromArray(SPECIES, new long[]{3L, 10L, 43L, 25L, 39L}, 0, mask);
-        var rhoA10to14Right = LongVector.fromArray(SPECIES, new long[]{61L, 54L, 21L, 39L, 25L}, 0, mask);
+        var rhoA10to14Left = LongVector.fromArray(SPECIES, new long[]{3L, 10L, 43L, 25L, 39L, 0L, 0L, 0L}, 0, mask);
+        var rhoA10to14Right = LongVector.fromArray(SPECIES, new long[]{61L, 54L, 21L, 39L, 25L, 0L, 0L, 0L}, 0, mask);
 
-        var rhoA15to19Left = LongVector.fromArray(SPECIES, new long[]{41L, 45L, 15L, 21L, 8L}, 0, mask);
-        var rhoA15to19Right = LongVector.fromArray(SPECIES, new long[]{23L, 19L, 49L, 43L, 56L}, 0, mask);
+        var rhoA15to19Left = LongVector.fromArray(SPECIES, new long[]{41L, 45L, 15L, 21L, 8L, 0L, 0L, 0L}, 0, mask);
+        var rhoA15to19Right = LongVector.fromArray(SPECIES, new long[]{23L, 19L, 49L, 43L, 56L, 0L, 0L, 0L}, 0, mask);
 
-        var rhoA20to24Left = LongVector.fromArray(SPECIES, new long[]{18L, 2L, 61L, 56L, 14L}, 0, mask);
-        var rhoA20to24Right = LongVector.fromArray(SPECIES, new long[]{46L, 62L, 3L, 8L, 50L}, 0, mask);
+        var rhoA20to24Left = LongVector.fromArray(SPECIES, new long[]{18L, 2L, 61L, 56L, 14L, 0L, 0L, 0L}, 0, mask);
+        var rhoA20to24Right = LongVector.fromArray(SPECIES, new long[]{46L, 62L, 3L, 8L, 50L, 0L, 0L, 0L}, 0, mask);
 
         long c0;
         long c1;
@@ -336,11 +336,18 @@ public class KeccakDigest implements ExtendedDigest {
 
 
             // rho
+            /*
             a0to4Vector = a0to4Vector.lanewise(VectorOperators.LSHL, rhoA0to4Left).lanewise(VectorOperators.OR, a0to4Vector.lanewise(VectorOperators.LSHR, rhoA0to4Right));
             a5to9Vector = a5to9Vector.lanewise(VectorOperators.LSHL, rhoA5to9Left).lanewise(VectorOperators.OR, a5to9Vector.lanewise(VectorOperators.LSHR, rhoA5to9Right));
             a10t014Vector = a10t014Vector.lanewise(VectorOperators.LSHL, rhoA10to14Left).lanewise(VectorOperators.OR, a10t014Vector.lanewise(VectorOperators.LSHR, rhoA10to14Right));
             a15to19Vector = a15to19Vector.lanewise(VectorOperators.LSHL, rhoA15to19Left).lanewise(VectorOperators.OR, a15to19Vector.lanewise(VectorOperators.LSHR, rhoA15to19Right));
             a20to24Vector = a20to24Vector.lanewise(VectorOperators.LSHL, rhoA20to24Left).lanewise(VectorOperators.OR, a20to24Vector.lanewise(VectorOperators.LSHR, rhoA20to24Right));
+*/
+            a0to4Vector = a0to4Vector.lanewise(VectorOperators.LSHL, rhoA0to4Left);
+            a5to9Vector = a5to9Vector.lanewise(VectorOperators.LSHL, rhoA5to9Left);
+            a10t014Vector = a10t014Vector.lanewise(VectorOperators.LSHL, rhoA10to14Left);
+            a15to19Vector = a15to19Vector.lanewise(VectorOperators.LSHL, rhoA15to19Left);
+            a20to24Vector = a20to24Vector.lanewise(VectorOperators.LSHL, rhoA20to24Left);
 
             a0to4Vector.intoArray(A, 0, mask);
             a5to9Vector.intoArray(A, 5, mask);
