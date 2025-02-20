@@ -6,6 +6,7 @@ import org.apache.tuweni.bytes.Bytes;
 import org.apache.tuweni.bytes.Bytes32;
 import org.hyperledger.besu.ethereum.trie.verkle.adapter.TrieKeyAdapter;
 import org.hyperledger.besu.ethereum.trie.verkle.hasher.PedersenHasher;
+import org.hyperledger.besu.nativelib.constantine.LibConstantineKeccak256;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Fork;
@@ -43,8 +44,6 @@ public class KeccakBenchmark {
     @Param({"20"}) int ADDRESS_SIZE;
     Bytes address;
 
-    TrieKeyAdapter trieKeyAdapter;
-
     @Setup
 
     public void setup() {
@@ -55,8 +54,8 @@ public class KeccakBenchmark {
         byte[] srcAddress = new byte[ADDRESS_SIZE];
         r.nextBytes(srcAddress);
         address = Bytes.wrap(srcAddress);
-        trieKeyAdapter = new TrieKeyAdapter(new PedersenHasher());
-        trieKeyAdapter.storageKey(address, bytes);
+        //register first time
+        LibConstantineKeccak256.keccak256(bytes.toArrayUnsafe());
     }
 
     @Benchmark
@@ -66,10 +65,11 @@ public class KeccakBenchmark {
     }
 
     @Benchmark
-    public void stemCryptoHash(final Blackhole blackhole) {
-        Bytes storageStem = trieKeyAdapter.storageKey(address, bytes);
-        blackhole.consume(storageStem);
+    public void keccakConstantine (final Blackhole blackhole) {
+        Bytes32 hash = Bytes32.wrap(LibConstantineKeccak256.keccak256(bytes.toArrayUnsafe()));
+        blackhole.consume(hash);
     }
+
 
     public static byte[] sha3(byte[] input) {
         Keccak256 digest =  new Keccak256();
